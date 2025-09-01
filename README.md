@@ -56,7 +56,7 @@ sudo apt install -y npm
 npm install -g pm2
 python -m venv .venv
 source .venv/bin/activate
-pip install uvicorn numpy torch
+pip install uvicorn numpy torch fastapi dotenv ollama
 ```
 
 ## 4 – Run the backend with PM2
