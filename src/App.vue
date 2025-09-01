@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import NeonText from './components/Neon.vue'
 </script>
 
 <template>
@@ -8,12 +8,15 @@ import HelloWorld from './components/HelloWorld.vue'
     <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
 
     <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+      <NeonText color="yellow">this is yellow</NeonText>
+      <NeonText color="green">this is green</NeonText>
+      <NeonText color="lightgray">this is light gray</NeonText>
+      <NeonText color="purple">this is purple</NeonText>
+      <NeonText color="red">this is red</NeonText>
 
-      <nav>
+      <!-- <nav>
         <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
+      </nav> -->
     </div>
   </header>
 
