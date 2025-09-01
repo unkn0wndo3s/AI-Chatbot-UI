@@ -1,39 +1,76 @@
-# AI chatbot UI
+# **AI Chatbot UI** – keep it simple, keep it functional
 
-This template should help get you started developing with Vue 3 in Vite.
+Welcome to the front‑end of the AI chatbot. No fancy settings, just a clean interface that anyone can drop into their web host and start talking to the bot.
 
-## Recommended IDE Setup
+## 🎯 Goal
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+_Provide a no‑frills web UI for an AI backend_
+Users should be able to open the page, type a message and get a response in less than a second.
 
-## Type Support for `.vue` Imports in TS
+## 📦 Release installation
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+1. Go to the **Releases** page of the repository.
+2. Download the latest zip file.
+3. Unzip it directly into your web server’s document root (or any sub‑folder you like).
+4. Open the index page in a browser – you’re done.
 
-## Customize configuration
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+## 🖼️ Screenshots
 
-## Project Setup
+![Chat UI screenshot](assets/screenshot.png)
 
-```sh
-npm install
+# **Installation guide** – front‑end
+
+The front‑end requires zero dependencies. Just follow the three‑step release process described in the README.
+
+### Step 1 – Download
+
+Grab the latest release zip from the GitHub *Releases* section.
+
+### Step 2 – Edit
+
+Edit the `.env` file and set the backend adresse.
+
+### Step 3 – Deploy
+
+Extract the archive into the folder that your web server serves (e.g. `/var/www/html/ai-chatbot`).
+
+
+# **Backend setup** – Python + PM2, because why not
+
+The backend is a tiny Python script that listens on port 8000 and replies to the UI’s calls.
+
+## 1 – Get the script
+
+Download `app.py` from the repository (or clone the repo and locate it in the `backend/` folder).
+
+## 2 – Fill in the blanks
+
+Open `app.py` in your favourite editor and replace the placeholder variables that are marked _**to fill**_ (API keys, model path, etc.). Save and close the file.
+
+## 3 – Prepare the server
+
+```bash
+sudo apt update
+sudo apt install -y npm
+npm install -g pm2
 ```
 
-### Compile and Hot-Reload for Development
+## 4 – Run the backend with PM2
 
-```sh
-npm run dev
+```bash
+pm2 start start.sh --name AI-Backend
 ```
 
-### Type-Check, Compile and Minify for Production
+PM2 will keep the script alive and restart it automatically if it crashes.
 
-```sh
-npm run build
+## 5 – Optional: open the port
+
+If your firewall blocks traffic, allow port 8000:
+
+```bash
+ufw allow 8000
 ```
+You should get a simple JSON response confirming the service is up.
 
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+That’s it. The UI will automatically hit `http://your-server:8000/` unless you changed the endpoint in `app.js`.
