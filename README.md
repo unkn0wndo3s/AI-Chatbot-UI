@@ -42,11 +42,11 @@ The backend is a tiny Python script that listens on port 8000 and replies to t
 
 ## 1 – Get the script
 
-Download `backend.py` from the repository (or clone the repo and locate it in the `backend/` folder).
+Download `app.py` from the repository (or clone the repo and locate it in the `backend/` folder).
 
 ## 2 – Fill in the blanks
 
-Open `backend.py` in your favourite editor and replace the placeholder variables that are marked _**to fill**_ (API keys, model path, etc.). Save and close the file.
+Open `app.py` in your favourite editor and replace the placeholder variables that are marked _**to fill**_ (API keys, model path, etc.). Save and close the file.
 
 ## 3 – Prepare the server
 
@@ -59,7 +59,7 @@ npm install -g pm2
 ## 4 – Run the backend with PM2
 
 ```bash
-pm2 start backend.py --name AI-Backend
+pm2 start start.sh --name AI-Backend
 ```
 
 PM2 will keep the script alive and restart it automatically if it crashes.
