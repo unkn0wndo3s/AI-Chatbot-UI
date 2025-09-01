@@ -54,12 +54,15 @@ Open `backend.py` in your favourite editor and replace the placeholder variables
 sudo apt update
 sudo apt install -y npm
 npm install -g pm2
+python -m venv .venv
+source .venv/bin/activate
+pip install uvicorn numpy torch
 ```
 
 ## 4 – Run the backend with PM2
 
 ```bash
-pm2 start backend.py --name AI-Backend
+pm2 start start.sh --name AI-Backend
 ```
 
 PM2 will keep the script alive and restart it automatically if it crashes.
