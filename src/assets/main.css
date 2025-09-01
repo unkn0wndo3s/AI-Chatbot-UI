@@ -16,8 +16,24 @@ a,
 }
 
 @media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
+  a:hover:not(.active) {
+    --c: #d3d3d3;
+    border-color: var(--c);
+    color: #d3d3d3;
+    box-shadow:
+      0 0 var(--neon-glow1) var(--c),
+      0 0 var(--neon-glow2) var(--c),
+      0 0 var(--neon-glow3) var(--c);
+
+    border-radius: var(--neon-radius);
+    padding: var(--neon-padding);
+    border: var(--neon-border) solid transparent;
+    font-weight: bold;
+    text-align: center;
+    display: inline-block;
+    background: #000;
+    width: 100%;
+    text-align: left;
   }
 }
 

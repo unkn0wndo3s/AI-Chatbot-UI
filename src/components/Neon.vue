@@ -26,7 +26,7 @@ const neonClass = computed(() => `neon-${props.color ?? 'purple'}`)
   --neon-glow1: 4px;
   --neon-glow2: 12px;
   --neon-glow3: 24px;
-  --neon-padding: 16px;
+  --neon-padding: 4px;
 }
 
 /* Base commune */
@@ -38,6 +38,7 @@ const neonClass = computed(() => `neon-${props.color ?? 'purple'}`)
   text-align: center;
   display: inline-block;
   background: #000; /* fond sombre pour voir le glow */
+  width: 100%;
 }
 
 /* Violet */
