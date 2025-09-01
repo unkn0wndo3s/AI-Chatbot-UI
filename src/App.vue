@@ -5,18 +5,10 @@ import NeonText from './components/Neon.vue'
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
     <div class="wrapper">
-      <NeonText color="yellow">this is yellow</NeonText>
-      <NeonText color="green">this is green</NeonText>
-      <NeonText color="lightgray">this is light gray</NeonText>
-      <NeonText color="purple">this is purple</NeonText>
-      <NeonText color="red">this is red</NeonText>
-
-      <!-- <nav>
+      <nav>
         <RouterLink to="/">Home</RouterLink>
-      </nav> -->
+      </nav>
     </div>
   </header>
 
