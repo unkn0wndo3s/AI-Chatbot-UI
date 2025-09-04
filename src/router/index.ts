@@ -1,22 +1,47 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import Home from '@/pages/Home.vue'
-import Chat from '@/pages/chat.vue' // il faudra créer cette page
+import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+import Chat from '@/pages/Chat.vue'
+import { useChatStore } from '@/stores/chat'
+
+const routes: RouteRecordRaw[] = [
+  {
+    path: '/',
+    redirect: () => {
+      const store = useChatStore()
+      return store.chats.length > 0 ? `/${store.chats[0].id}` : '/404'
+    },
+  },
+  { path: '/:id', name: 'chat', component: Chat },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: () => {
+      const store = useChatStore()
+      return store.chats.length > 0 ? `/${store.chats[0].id}` : '/404'
+    },
+  },
+]
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      path: '/',
-      name: 'home',
-      component: Home,
-    },
-    {
-      path: '/:id',
-      name: 'chat',
-      component: Chat,
-      props: true, // pour que l'id soit injecté dans les props du composant
-    },
-  ],
+  history: createWebHistory(),
+  routes,
+  scrollBehavior() {
+    return { top: 0 }
+  },
+})
+
+router.beforeEach((to, from) => {
+  const store = useChatStore()
+  if (store.isLoading && to.fullPath !== from.fullPath) {
+    const ok = window.confirm('Une requête est encore en cours. Quitter cette page ?')
+    if (!ok) return false
+  }
+  return true
+})
+window.addEventListener('beforeunload', (e) => {
+  const store = useChatStore()
+  if (store.isLoading) {
+    e.preventDefault()
+    e.returnValue = ''
+  }
 })
 
 export default router

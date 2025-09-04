@@ -1,51 +1,54 @@
-@import './base.css';
+:root {
+  --bg: #0b0b0e;
+  --panel: #0f0f14;
+  --panel2: #111118;
+  --text: #e7e7ea;
+  --muted: #9ea0a8;
+  --line: #1e1e26;
+  --brand: #5b61ff;
+  --brand-2: #3e45e6;
+  --code: #0c0c12;
+  --code-line: #1a1a23;
+}
 
-#app {
-  max-width: 100vw;
-  margin: 0 auto;
-  font-weight: normal;
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  height: 100vh;
+  overflow: hidden;
+  background: radial-gradient(1200px 800px at 70% -20%, #181828 0%, transparent 60%), var(--bg);
+  color: var(--text);
+  font:
+    14px/1.45 system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Ubuntu,
+    Cantarell,
+    'Helvetica Neue',
+    Arial,
+    'Noto Sans',
+    'Apple Color Emoji',
+    'Segoe UI Emoji';
+  letter-spacing: 0.2px;
+}
+
+/* Layout */
+.app {
+  height: 100%;
+  display: grid;
+  grid-template-columns: 280px 1fr;
   overflow: hidden;
 }
-
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
-}
-
-@media (hover: hover) {
-  a:hover:not(.active) {
-    --c: #d3d3d3;
-    border-color: var(--c);
-    color: #d3d3d3;
-    box-shadow:
-      0 0 var(--neon-glow1) var(--c),
-      0 0 var(--neon-glow2) var(--c),
-      0 0 var(--neon-glow3) var(--c);
-
-    border-radius: var(--neon-radius);
-    padding: var(--neon-padding);
-    border: var(--neon-border) solid transparent;
-    font-weight: bold;
-    text-align: center;
-    display: inline-block;
-    background: #000;
-    width: 100%;
-    text-align: left;
-  }
-}
-
-@media (min-width: 1024px) {
-  body {
-    display: flex;
-    place-items: center;
-  }
-
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
 }
