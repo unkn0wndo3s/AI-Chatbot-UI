@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { cfg } from '@/config'
 
 export type MsgRole = 'assistant' | 'user'
 
@@ -13,12 +14,6 @@ export type Chat = {
   name: string
   messages: Message[]
 }
-const API_BASE =
-  import.meta.env.VITE_USE_PROXY === 'true'
-    ? '/api'
-    : String(import.meta.env.VITE_API_BASE || '/api') // fallback proxy
-
-const apiKey = 'a9$Kz!3Q@pL7*Xw2#bV5%tY8&nR0^jM1*'
 
 function generateChatId(): string {
   const timestamp = Date.now().toString(36)
@@ -31,55 +26,48 @@ function nowFR(): string {
 }
 
 export const useChatStore = defineStore('chat', () => {
-  // état
+  // state
   const chats = ref<Chat[]>([])
   const currentId = ref<string | null>(null)
-  const isLoading = ref(false) // pour router + UI
+  const isLoading = ref(false)
 
-  // dérivés
-  const currentChat = computed<Chat | undefined>(() =>
-    chats.value.find((c) => c.id === currentId.value),
-  )
+  // getters
+  const currentChat = computed(() => chats.value.find((c) => c.id === currentId.value))
 
-  // API helpers
-  async function apiGET(path: string): Promise<any | null> {
-    try {
-      const resp = await fetch(`${API_BASE}${path}`)
-      if (!resp.ok) return null
-      return await resp.json()
-    } catch {
-      return null
-    }
+  // --- HTTP helpers (lisent cfg à l'exécution) ------------------------------
+  function withKey(path: string): string {
+    const key = cfg.PUBLIC_API_KEY ?? ''
+    const sep = path.includes('?') ? '&' : '?'
+    return `${path}${sep}key=${encodeURIComponent(key)}`
   }
 
-  async function apiPOST(path: string, body: any): Promise<any | null> {
-    try {
-      const resp = await fetch(`${API_BASE}${path}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      })
-      if (!resp.ok) return null
-      return await resp.json()
-    } catch {
-      return null
-    }
+  async function httpGET(path: string): Promise<any> {
+    const url = `${cfg.API_BASE}${path}`
+    const resp = await fetch(url, { mode: 'cors' })
+    if (!resp.ok) throw new Error(`${resp.status} ${await resp.text()}`)
+    return resp.json()
   }
 
-  // charge la liste des sessions côté serveur + sélectionne la 1ère
+  async function httpPOST(path: string, body: any): Promise<any> {
+    const url = `${cfg.API_BASE}${path}`
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      mode: 'cors',
+    })
+    if (!resp.ok) throw new Error(`${resp.status} ${await resp.text()}`)
+    return resp.json()
+  }
+  // -------------------------------------------------------------------------
+
+  // actions
   async function loadExistingChats(): Promise<void> {
     chats.value = []
     currentId.value = null
 
     try {
-      const resp = await fetch(`${API_BASE}/messaging?key=${encodeURIComponent(apiKey)}`, {
-        mode: 'cors',
-      })
-      if (!resp.ok) {
-        console.error('GET /messaging failed:', resp.status, await resp.text())
-        return
-      }
-      const data = await resp.json()
+      const data = await httpGET(withKey('/messaging'))
 
       if (!data || !Array.isArray(data.chats)) {
         console.error('Unexpected payload shape for /messaging:', data)
@@ -87,7 +75,6 @@ export const useChatStore = defineStore('chat', () => {
       }
 
       for (const entry of data.chats) {
-        // on s'attend à { id, name }
         if (!entry || typeof entry !== 'object' || !entry.id) continue
         const id = String(entry.id)
         const name = entry.name ? String(entry.name) : id
@@ -102,22 +89,16 @@ export const useChatStore = defineStore('chat', () => {
       console.error('loadExistingChats error:', e)
     }
   }
+
   async function selectChat(id: string): Promise<void> {
+    if (currentId.value === id && currentChat.value?.messages.length) return
     currentId.value = id
     const chat = chats.value.find((c) => c.id === id)
     if (!chat) return
     if (chat.messages.length) return
 
     try {
-      const resp = await fetch(
-        `${API_BASE}/messaging/${encodeURIComponent(id)}?key=${encodeURIComponent(apiKey)}`,
-        { mode: 'cors' },
-      )
-      if (!resp.ok) {
-        console.error('GET /messaging/:id failed:', resp.status, await resp.text())
-        return
-      }
-      const data = await resp.json()
+      const data = await httpGET(withKey(`/messaging/${encodeURIComponent(id)}`))
       if (Array.isArray(data?.history)) {
         chat.messages = data.history.map((m: any) => ({
           role: (m?.role === 'user' ? 'user' : 'assistant') as MsgRole,
@@ -136,29 +117,30 @@ export const useChatStore = defineStore('chat', () => {
     const clean = text.trim()
     if (!clean) return
 
-    const stamp = new Date().toLocaleString('fr-FR')
+    const stamp = nowFR()
     chat.messages.push({ role: 'user', content: `[${stamp}] : ${clean}` })
 
-    const payload: Record<string, any> = { prompt: clean, key: apiKey, name: chat.name }
+    const payload: Record<string, any> = {
+      prompt: clean,
+      key: cfg.PUBLIC_API_KEY ?? '',
+      name: chat.name,
+    }
 
     isLoading.value = true
     try {
-      const resp = await fetch(`${API_BASE}/messaging/${encodeURIComponent(chat.id)}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      })
       let assistant = 'I think an error happened inside me'
-      if (resp.ok) {
-        const data = await resp.json()
-        if (typeof data?.response === 'string') assistant = data.response
-      } else {
-        console.error('POST /messaging/:id failed:', resp.status, await resp.text())
-      }
-      const stamp2 = new Date().toLocaleString('fr-FR')
+      const data = await httpPOST(`/messaging/${encodeURIComponent(chat.id)}`, payload)
+      if (typeof data?.response === 'string') assistant = data.response
+
+      const stamp2 = nowFR()
       chat.messages.push({ role: 'assistant', content: `[${stamp2}] : ${assistant}` })
     } catch (e) {
       console.error('sendMessage error:', e)
+      const stamp2 = nowFR()
+      chat.messages.push({
+        role: 'assistant',
+        content: `[${stamp2}] : I think an error happened inside me`,
+      })
     } finally {
       isLoading.value = false
     }
